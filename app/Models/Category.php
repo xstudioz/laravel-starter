@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Blog extends Model
+class Category extends Model
 {
     use SoftDeletes, HasSlug;
 
@@ -21,5 +21,5 @@ class Blog extends Model
             ->doNotGenerateSlugsOnUpdate();
     }
 
-    public function categories(): BelongsToMany { return $this->belongsToMany(Category::class); }
+    public function blogs(): BelongsToMany { return $this->belongsToMany(Blog::class); }
 }

@@ -20,10 +20,27 @@ class CreateBlogsTable extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+
+
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug');
+            $table->softDeletes();
+            $table->timestamps();
+        });
+
+        Schema::create('blog_category', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('blog_id');
+        });
     }
 
     public function down()
     {
         Schema::dropIfExists('blogs');
+        Schema::dropIfExists('categories');
+        Schema::dropIfExists('blog_category');
     }
 }
