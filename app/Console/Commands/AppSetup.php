@@ -18,6 +18,7 @@ class AppSetup extends Command
         $this->clearData();
         $this->setupRoles();
         $this->createAdmins();
+        $this->customSetup();
     }
 
     function setupRoles()
@@ -39,6 +40,11 @@ class AppSetup extends Command
         $user->name = 'Admin Sidhu';
         $user->save();
         $user->assignRole('admin');
+
+    }
+
+    private function customSetup()
+    {
 
     }
 }
