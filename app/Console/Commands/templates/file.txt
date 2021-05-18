@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\#class#;
+use App\Models\User;
+use App\Xstudioz\ResponseHelper;
+use App\Xstudioz\SortNSearch;
+use Exception;
+use Hash;
+
+class #class#Controller extends Controller
+{
+    use SortNSearch;
+
+   function index()
+    {
+        $perPage = request()->per_page ?? 15;
+        $query = #class#::query();
+        $this->applySearchAndSort($query, request());
+        return $query->paginate($perPage);
+    }
+
+    function create()
+    {
+        $id = request()->id;
+        $fields = [/*field*/];
+        #snakeClass# = $id ? #class#::findOrFail($id) : new #class#();
+        $this->populate($fields,#snakeClass#);
+
+        #snakeClass#->save();
+        return ResponseHelper::success("#name# Updated", ['item' => #snakeClass#]);
+    }
+
+    function destroy()
+    {
+        $id = request()->id;
+        try {
+            #class#::findOrFail($id)->delete();
+            return ResponseHelper::success("#name# Deleted");
+        } catch (Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
+    }
+}

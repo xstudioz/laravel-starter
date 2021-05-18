@@ -10,4 +10,15 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    function populate($fields, &$object, $setToNullIfEmpty = false)
+    {
+        foreach ($fields as $field) {
+            if (request()->exists($field)) {
+                $object[$field] = request()->input($field);
+            } else {
+                if ($setToNullIfEmpty) $object[$field] = null;
+            }
+        }
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use Artisan;
 use Illuminate\Console\Command;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class AppSetup extends Command
@@ -19,11 +20,18 @@ class AppSetup extends Command
         $this->setupRoles();
         $this->createAdmins();
         $this->customSetup();
+        $this->seeders();
     }
 
     function setupRoles()
     {
-        Role::create(['name' => 'admin']);
+        //create permisssions
+        Permission::create(['name' => 'backend:login']);
+
+        /** @var Role $role */
+        $role = Role::create(['name' => 'admin']);
+        $role->givePermissionTo('backend:login');
+
     }
 
     function clearData()
@@ -45,6 +53,14 @@ class AppSetup extends Command
 
     private function customSetup()
     {
+
+    }
+
+    private function seeders()
+    {
+        Artisan::call('db:seed --class=CitySeeder', []);
+        Artisan::call('db:seed --class=AmenitySeeder', []);
+        Artisan::call('db:seed --class=HotelSeeder', []);
 
     }
 }

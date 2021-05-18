@@ -12,7 +12,7 @@ class CreateBlogsTable extends Migration
             $table->bigIncrements('id');
             $table->string('title');
             $table->string('slug');
-            $table->longText('content');
+            $table->longText('content')->nullable();
             $table->string('banner')->nullable();
             $table->bigInteger('user_id')->nullable();
 
@@ -34,6 +34,18 @@ class CreateBlogsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('blog_id');
+        });
+
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug');
+            $table->timestamps();
+        });
+        Schema::create('taggable', function (Blueprint $table) {
+            $table->string('tag_id');
+            $table->string('taggable_id');
+            $table->string('taggable_type');
         });
     }
 
