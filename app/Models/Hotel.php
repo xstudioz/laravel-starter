@@ -67,28 +67,49 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\HotelRoom[] $rooms
  * @property-read int|null $rooms_count
  * @method static \Database\Factories\HotelFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel front()
+ * @property-read mixed $web_link
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\HotelBooking[] $hotelBookings
+ * @property-read int|null $hotel_bookings_count
  */
 class Hotel extends Model
 {
-    use SoftDeletes, HasSlug, HasFactory;
+  use SoftDeletes, HasSlug, HasFactory;
 
-    protected $casts = [
-        'available' => 'boolean',
-        'couple_friendly' => 'boolean',
-        'map_location' => 'array',
-        'seo' => 'array'
-    ];
+  protected $casts = [
+    'available' => 'boolean',
+    'couple_friendly' => 'boolean',
+    'map_location' => 'array',
+    'nearby_places' => 'array',
+    'seo' => 'array'
+  ];
 
-    public function getSlugOptions(): SlugOptions
-    {
-        return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug');
+  protected $appends = [
+    'web_link'
+  ];
+
+  public function getSlugOptions(): SlugOptions { return SlugOptions::create()->generateSlugsFrom('name')->saveSlugsTo('slug'); }
+
+  public function city(): BelongsTo { return $this->belongsTo(City::class); }
+
+  public function amenities(): MorphToMany { return $this->morphToMany(Amenity::class, 'amenity_records'); }
+
+  public function hotelBookings(): HasMany { return $this->hasMany(HotelBooking::class); }
+
+  public function rooms(): HasMany { return $this->hasMany(HotelRoom::class); }
+
+  public function scopeFront($query) { return $query->with(['city']); }
+
+  public function getWebLinkAttribute() { return route('hotel.single', ['city' => $this->city->slug, 'hotel' => $this->slug]); }
+
+  // extra function
+  public function getRoomImages(): array
+  {
+    $images = [];
+    foreach ($this->rooms as $room) {
+      $images = [...$images, ...$room->images];
     }
-
-
-    public function city(): BelongsTo { return $this->belongsTo(City::class); }
-
-    public function amenities(): MorphToMany { return $this->morphToMany(Amenity::class, 'amenity_records'); }
-
-    public function rooms(): HasMany { return $this->hasMany(HotelRoom::class); }
+    return $images;
+  }
 
 }
