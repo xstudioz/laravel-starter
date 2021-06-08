@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\HotelBooking
@@ -44,8 +47,28 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelBooking whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelBooking whereUserId($value)
  * @mixin \Eloquent
+ * @property-read \App\Models\Hotel $hotel
+ * @method static Builder|HotelBooking booked(\Carbon\Carbon $checkInDate, \Carbon\Carbon $checkOutDate)
+ * @property-read \App\Models\Booking $booking
  */
 class HotelBooking extends Model
 {
-    use HasFactory;
+  protected $dates = ['check_in', 'check_out'];
+  use HasFactory;
+
+  function hotel(): BelongsTo { return $this->belongsTo(Hotel::class); }
+
+  function booking(): BelongsTo { return $this->belongsTo(Booking::class); }
+
+  function scopeBooked(Builder $query, Carbon $checkInDate, Carbon $checkOutDate)
+  {
+    $query->where(function ($query) use ($checkInDate, $checkOutDate) {
+      $query->whereBetween('check_in', [$checkInDate, $checkOutDate]);
+      $query->orWhereBetween('check_out', [$checkInDate, $checkOutDate]);
+    }); // booked rooms based on dates
+    $query->whereHas('booking', function ($query) {
+      $query->whereIn('status', ['paid', 'booked']);
+    }); //only booked and paid bookings are counted
+  }
+
 }

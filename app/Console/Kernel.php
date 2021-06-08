@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\AppSetup;
 use App\Console\Commands\IdeHelper;
+use App\Console\Commands\MakePermissions;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -18,6 +19,7 @@ class Kernel extends ConsoleKernel
         //
         AppSetup::class,
         IdeHelper::class,
+        MakePermissions::class,
     ];
 
     /**

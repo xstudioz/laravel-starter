@@ -1,0 +1,10 @@
+// scss-docs-start alert-variant-mixin
+@mixin alert-variant($background, $border, $color) {
+  color: #fff;
+  background-color: $color;
+  .alert-link {
+    color: shade-color($color, 20%);
+  }
+}
+
+// scss-docs-end alert-variant-mixin

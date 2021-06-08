@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\CabBooking
@@ -16,8 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $number_of_passengers
  * @property string $pickup_location
  * @property string $drop_location
- * @property string $pickup_time
- * @property string|null $return_pickup_time
+ * @property Carbon $pickup_time
+ * @property Carbon|null $return_pickup_time
  * @property float $distance
  * @property int $days
  * @property string $cab_type
@@ -52,8 +53,32 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|CabBooking whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CabBooking whereUserId($value)
  * @mixin \Eloquent
+ * @property-read mixed $total_distance
  */
 class CabBooking extends Model
 {
-    use HasFactory;
+  const ROUND_TRIP = 'round';
+  const ONE_WAY = 'single';
+
+  use HasFactory;
+
+  protected $dates = [
+    'pickup_time', 'return_pickup_time'
+  ];
+
+  protected $appends = ['total_distance', 'total_amount'];
+
+  public function getTotalDistanceAttribute()
+  {
+    $d = $this->distance;
+    $Multiplier = $this->trip_type === self::ROUND_TRIP ? 2 : 1;
+    return $Multiplier * $d;
+  }
+
+  public function getTotalAmount()
+  {
+    return ($this->distance_charge * $this->getTotalDistanceAttribute() / 1000) + ($this->halting_charge * $this->days);
+  }
+
+
 }
